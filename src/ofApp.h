@@ -13,6 +13,8 @@ public:
 	void exit();
 	
 	void drawPointCloud();
+
+	void getNearMirror(ofxCvGrayscaleImage &imgGray, int contrasteDistancia);
 	
 	void keyPressed(int key);
 	void mouseDragged(int x, int y, int button);

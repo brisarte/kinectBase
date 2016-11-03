@@ -17,7 +17,7 @@ void ofApp::setup() {
 	
 	
 	colorImg.allocate(kinect.width, kinect.height);
-	grayImage.allocate(kinect.width, kinect.heig:ht);
+	grayImage.allocate(kinect.width, kinect.height);
 	
 	
 	ofSetFrameRate(60);
@@ -43,8 +43,20 @@ void ofApp::update() {
 		// load grayscale depth image from the kinect source
 		grayImage.setFromPixels(kinect.getDepthPixels());
 	
+		getNearMirror(grayImage, 158);
 	}
 	
+}
+
+void ofApp::getNearMirror(ofxCvGrayscaleImage &imgGray, int contrasteDistancia) {
+
+	imgGray.mirror(false,true);
+	ofPixels & pixNoise = imgGray.getPixels();
+	int numPixelsNoise = pixNoise.size();
+	for (int i = 0; i < numPixelsNoise; i++) {
+		pixNoise[i] = ofClamp(ofMap(pixNoise[i], 0, 255, -contrasteDistancia, 255), 0, 255); // Aumenta contraste de distancia
+	}
+	imgGray.flagImageChanged();
 }
 
 //--------------------------------------------------------------
@@ -70,12 +82,12 @@ void ofApp::draw() {
 	stringstream reportStream;
         
     if(kinect.hasAccelControl()) {
-        reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
+        reportStream << "acc: " << ofToString(kinect.getMksAccel().x, 2) << " / "
         << ofToString(kinect.getMksAccel().y, 2) << " / "
         << ofToString(kinect.getMksAccel().z, 2) << endl;
     }
     
-	reportStream << ", fps: " << ofGetFrameRate() << endl;
+	reportStream << "fps: " << ofGetFrameRate() << endl;
     
 	ofDrawBitmapString(reportStream.str(), 20, 652);
     
