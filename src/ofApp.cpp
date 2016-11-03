@@ -28,6 +28,11 @@ void ofApp::setup() {
 	
 	// start from the front
 	bDrawPointCloud = false;
+
+	//Load shader
+	shader.load( "vertexdummy.c", "kinectshader.c" );
+
+	fbo.allocate(kinect.width, kinect.height);
 }
 
 //--------------------------------------------------------------
@@ -42,7 +47,6 @@ void ofApp::update() {
 		
 		// load grayscale depth image from the kinect source
 		grayImage.setFromPixels(kinect.getDepthPixels());
-	
 		getNearMirror(grayImage, 158);
 	}
 	
@@ -50,7 +54,7 @@ void ofApp::update() {
 
 void ofApp::getNearMirror(ofxCvGrayscaleImage &imgGray, int contrasteDistancia) {
 
-	imgGray.mirror(false,true);
+	//imgGray.mirror(false,true);
 	ofPixels & pixNoise = imgGray.getPixels();
 	int numPixelsNoise = pixNoise.size();
 	for (int i = 0; i < numPixelsNoise; i++) {
@@ -90,6 +94,43 @@ void ofApp::draw() {
 	reportStream << "fps: " << ofGetFrameRate() << endl;
     
 	ofDrawBitmapString(reportStream.str(), 20, 652);
+
+
+	fbo.begin();
+	
+	ofSetColor( 255, 255, 255 );
+	grayImage.draw(0, 0, kinect.width, kinect.height);
+
+	fbo.end();
+
+	/*
+	fbo2.begin();
+	
+	ofSetColor( 255, 255, 255 );
+	kinect.draw(0, 0, kinect.width, kinect.width);
+
+	fbo2.end();
+
+	*/
+
+	//Enable shader
+	shader.begin();
+
+    //pass time value to shader
+	//shader.setUniform1f("time", time );
+			
+	shader.setUniformTexture( "texture1", fbo.getTextureReference(), 1 ); //"1" means that it is texture 1
+
+	//shader.setUniformTexture( "texture2", fbo2.getTextureReference(), 2 ); //"2" means that it is texture 2
+
+	//Draw image through shader
+	ofSetColor( 255, 255, 255 );
+	kinect.draw( 420, 320, 400, 300);
+
+	//ofSetColor( 255, 255, 255, 128 );
+	//fbo2.draw( 0, 0 );
+
+	shader.end();
     
 }
 

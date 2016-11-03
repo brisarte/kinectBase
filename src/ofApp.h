@@ -33,7 +33,12 @@ public:
 	bool bDrawPointCloud;
 	
 	int angle;
-	
+
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
+private:
+	ofFbo fbo, fbo2;	//buffer for drawing screen
+	
+	ofShader shader; //Shader
+	
 };
