@@ -32,23 +32,31 @@ void ofApp::setup() {
 	//Load shader
 	shader.load( "vertexdummy.c", "kinectshader.c" );
 
+	//Carrega o vídeo
+	video.load("amazonia.mp4");
+	video.play();
+
 	fbo.allocate(kinect.width, kinect.height);
+	fboVideo.allocate( video.getWidth(), video.getHeight());
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	
-	ofBackground(100, 100, 100);
+	ofBackground(0, 0, 0);
 	
 	kinect.update();
 	
-	// there is a new frame and we are connected
+	// Só executa se aconteceu algo no kinect
 	if(kinect.isFrameNew()) {
 		
 		// load grayscale depth image from the kinect source
 		grayImage.setFromPixels(kinect.getDepthPixels());
 		getNearMirror(grayImage, 158);
 	}
+
+	//Atualiza frame do video
+	video.update();
 	
 }
 
@@ -74,10 +82,10 @@ void ofApp::draw() {
 		easyCam.end();
 	} else {
 		// draw from the live kinect
-		kinect.drawDepth(10, 10, 400, 300);
-		kinect.draw(420, 10, 400, 300);
+		kinect.drawDepth(10, 10, 200, 150);
+		kinect.draw(210, 10, 200, 150);
 		
-		grayImage.draw(10, 320, 400, 300);
+		grayImage.draw(10, 160, 200, 150);
 		
 	}
 	
@@ -125,10 +133,26 @@ void ofApp::draw() {
 
 	//Draw image through shader
 	ofSetColor( 255, 255, 255 );
-	kinect.draw( 420, 320, 400, 300);
+	kinect.draw( 210, 160, 200, 150);
 
-	//ofSetColor( 255, 255, 255, 128 );
-	//fbo2.draw( 0, 0 );
+	shader.end();
+
+
+	fboVideo.begin();
+	
+	ofSetColor( 255, 255, 255 );
+	grayImage.draw(0, 0, video.getWidth(), video.getHeight());
+
+	fboVideo.end();
+
+	//Enable shader
+	shader.begin();
+			
+	shader.setUniformTexture( "texture1", fboVideo.getTextureReference(), 1 ); //"1" means that it is texture 1
+
+	//Draw image through shader
+	ofSetColor( 255, 255, 255 );
+	video.draw( 0, 0, 1024, 768);
 
 	shader.end();
     

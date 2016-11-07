@@ -36,8 +36,10 @@ public:
 
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
+
+	ofVideoPlayer video;
 private:
-	ofFbo fbo, fbo2;	//buffer for drawing screen
+	ofFbo fbo, fbo2, fboVideo;	//buffer para telas
 	
 	ofShader shader; //Shader
 	
